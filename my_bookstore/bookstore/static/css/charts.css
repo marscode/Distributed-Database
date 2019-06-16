@@ -1,0 +1,29 @@
+/* Layout: */
+
+
+  
+  /* Responsive: */
+  
+  @media only screen and (min-width: 640px) {
+    .layout {
+      display: 100%;;
+    }
+  }
+  
+  /* etc */
+  
+  body {
+    margin: 1.5em;
+  }
+  
+  .container {
+    max-width: 100em;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  
+  .col {
+    padding: 1em;
+    margin: 0 2px 2px 0;
+    background: #b3e888;
+  }
