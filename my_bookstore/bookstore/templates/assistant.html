@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <style>
+    body {
+  display: grid;
+  place-items: center;
+  height: 80vh;
+  background-image: url(/static/images/body-image.jpg);
+  background-repeat: no-repeat;
+    background-position: center;
+}
+
+    </style>
+
+    <body>
+        <div style="border: 2px solid; background-color:green;margin-top:30%;padding: 10px">
+            <h4 style="color:white">Hello, Please Enter Your Username Assistant,</h4>
+            <form method="GET" action="{% url 'Welcome' %}" style="text-align: center">
+                {%  csrf_token %}
+                {% if messages %}
+                {% for message in messages %}
+                <input type="text" required name="username" value="{{ request.GET.username }}" placeholder="Username">
+                    <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
+                     <strong>{{ message }}</strong> 
+                    </div>
+                    
+                    <button class="btn btn-success" type="submit">
+                        Enter
+                    </button>
+                    <a type="button" class="btn btn-success" href="{% url 'logout' %}">
+                        Cancel
+                    </a>
+                {% endfor %}
+                {% else %}    
+            <input type="text" required name="username" value="{{ request.GET.username }}" placeholder="Username">
+            <br>
+            <button class="btn btn-success" type="submit">
+                Enter
+            </button>
+            <a type="button" class="btn btn-success" href="{% url 'login' %}">
+                Cancel
+            </a>
+            {% endif %}
+        </form>
+        </div>    
+    </body>
+</head>
+</html>

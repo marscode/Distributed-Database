@@ -1,0 +1,18 @@
+
+<div class="pagination" style="float:right">
+    <span style="float:right">
+        {% if List_transaction.has_previous %}
+            <a href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo; first</a>
+            <a href="?page={{ List_transaction.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">previous</a>
+        {% endif %}
+
+        <span class="current" >
+            Page {{ List_transaction.number }} of {{ List_transaction.paginator.num_pages }}.
+        </span>
+
+        {% if List_transaction.has_next %}
+            <a href="?page={{ List_transaction.next_page_number }}{% if query %}&q={{ query }}{% endif %}">next</a>
+            <a href="?page={{ List_transaction.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>

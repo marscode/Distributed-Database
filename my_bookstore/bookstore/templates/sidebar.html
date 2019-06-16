@@ -1,0 +1,20 @@
+ <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+ <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav side-nav">
+            <li>
+                <a href="{% url 'inventory' %}"><i class="fa fa-fw fa fa-cart-plus"></i>  Inventory</a>
+            </li>
+            <li>
+                <a href="{% url 'TransactionList' %}"><i class="fa fa-fw fa fa-exchange"></i> Transaction</a>
+            </li>
+            <li>
+                <a href="{% url 'charts' %}"><i class="fa fa-bar-chart-o"></i> Charts</a>
+            </li>
+            <div style="display:table-cell; vertical-align:middle; text-align:center">
+            <a class="navbar-brand" href="https://www.lsu.edu.ph" target="_blank" style="padding-top: 100%;">
+                {% load static %}
+                <img src="{% static 'images/lsu-seal.png' %}" width="100%" alt="LSU" title="La Salle University">
+            </a>
+        </div>
+        </ul>
+    </div>

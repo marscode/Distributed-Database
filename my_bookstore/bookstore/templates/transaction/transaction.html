@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <!------ Include the above in your HEAD tag ---------->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/welcome.css' %}">
+        <link rel="stylesheer" type="text/css" href="{% static 'css/style1.css' %}">
+        <script src="{% static 'js/checkbox.js' %}"></script>
+        <style>
+        #products {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            }
+  
+        #products td, #products th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+  
+        #products tr:nth-child(even){background-color: #f2f2f2;}
+  
+        #products tr:hover {background-color: #ddd;}
+  
+        #products th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+        }
+        /* enable absolute positioning */
+.inner-addon { 
+    position: relative; 
+}
+
+/* style icon */
+.inner-addon .fa-fw {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+/* align icon */
+.left-addon .fa-fw  { left:  0px;}
+
+/* add padding  */
+.left-addon input  { padding-left:  30px; }
+        </style>
+
+    <body>
+            <div id="throbber" style="display:none; min-height:120px;"></div>
+            <div id="noty-holder"></div>
+            <div id="wrapper">
+                <!-- Navigation -->
+                <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="http://cijulenlinea.ucr.ac.cr/dev-users/">
+                            <img src="http://placehold.it/200x50&text=LOGO" alt="LOGO">
+                        </a>
+                    </div>
+                    <!-- Top Menu Items -->
+                    <ul class="nav navbar-right top-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin User <b class="fa fa-angle-down"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="divider"></li>
+                                <li>
+                                        <form method="POST" action="{% url 'logout' %}" class="inner-addon left-addon">
+                                            {% csrf_token %}
+                                            <i class="fa fa-fw fa-power-off"></i>
+                                            <input type="submit" value="Logout" class="form-control"/>
+                                        </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                   {% include 'sidebar.html' %}
+                    <!-- /.navbar-collapse -->
+                </nav>
+               <div>
+                   <div style="border:1px solid black; width: 95%;margin-left: 2%;margin-top: 7%;background-color: lightgrey">
+                   <form method="GET" action="{% url 'transac_search' %}">
+                  <div style="display:inline">
+                        <input type="text" name="q" placeholder="Search.." value="{{ request.GET.q }}">
+                        <button class="btn btn-success" type="submit">
+                           Search
+                        </button>
+                    
+                         {% if messages %}
+                                 {% for message in messages %}
+                                     <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
+                                     </div>
+                           <div>
+                           </div>
+                       {% endfor %}
+                               {% endif %}
+                   </form>   
+                   <p style="display:inline-block;margin-left:25%;font-size: 20px">{{ transac }}</p> 
+                </div>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'TransactionList' %}" >
+                        {% csrf_token %}
+                    <table id="products" >
+                         <tr>
+                            <th>Assistant</th>
+                             <th>Category</th>
+                             <th>Product Name</th>
+                             <th>Quantity</th>
+                             <th>Price</th>
+                             <th>Total</th>
+                             <th>Date</th>
+                         </tr>
+                        
+                         {% for tran_list in List_transaction  %}
+                         
+                         <tr>   
+                                <td>{{ tran_list.assistant_username.username }}</td>
+                                <td>{{ tran_list.item.category }}</td>
+                                <td>{{ tran_list.item.product_name }}</td>
+                                <td>{{ tran_list.quantity }}</td>
+                                <td>{{ tran_list.item.price }}</td>
+                                <td>{{ tran_list.total }}</td>
+                                <td>{{ tran_list.date }}</td>
+                            </tr>
+                            {% endfor %}    
+                    </table>
+                    <div>
+                        {% include 'transaction/pagination_transac.html' %}
+                    </div>
+                </form>
+               </div> 
+            </div><!-- /#wrapper -->
+    </body>
+</head>
+</html>

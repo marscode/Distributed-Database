@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <!------ Include the above in your HEAD tag ---------->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/welcome.css' %}">
+        <link rel="stylesheer" type="text/css" href="{% static 'css/style1.css' %}">
+        <script src="{% static 'js/checkbox.js' %}"></script>
+        <style>
+        #products {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            }
+  
+        #products td, #products th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+  
+        #products tr:nth-child(even){background-color: #f2f2f2;}
+  
+        #products tr:hover {background-color: #ddd;}
+  
+        #products th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+        }
+        /* enable absolute positioning */
+.inner-addon { 
+    position: relative; 
+}
+
+/* style icon */
+.inner-addon .fa-fw {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+/* align icon */
+.left-addon .fa-fw  { left:  0px;}
+
+/* add padding  */
+.left-addon input  { padding-left:  30px; }
+        </style>
+
+    <body>
+            <div id="throbber" style="display:none; min-height:120px;"></div>
+            <div id="noty-holder"></div>
+            <div id="wrapper">
+                <!-- Navigation -->
+                <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="http://cijulenlinea.ucr.ac.cr/dev-users/">
+                            <img src="http://placehold.it/200x50&text=LOGO" alt="LOGO">
+                        </a>
+                    </div>
+                    <!-- Top Menu Items -->
+                    <ul class="nav navbar-right top-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin User <b class="fa fa-angle-down"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="divider"></li>
+                                <li>
+                                        <form method="POST" action="{% url 'logout' %}" class="inner-addon left-addon">
+                                            {% csrf_token %}
+                                            <i class="fa fa-fw fa-power-off"></i>
+                                            <input type="submit" value="Logout" class="form-control"/>
+                                        </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                   {% include 'sidebar.html' %}
+                    <!-- /.navbar-collapse -->
+                </nav>
+               <div>
+                   <div style="border:1px solid black; width: 95%;margin-left: 2%;margin-top: 7%;background-color: lightgrey">
+                   <form method="GET" action="{% url 'search' %}">
+                  <div style="display:inline">
+                        <input type="text" name="q" placeholder="Search.." value="{{ request.GET.q }}">
+                        <button class="btn btn-success" type="submit">
+                           Search
+                        </button>
+                    
+                         {% if messages %}
+                                 {% for message in messages %}
+                                     <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
+                                     </div>
+                           <div>
+                           </div>
+                       {% endfor %}
+                               {% endif %}
+                   </form>   
+                   <p style="display:inline-block;margin-left:25%;font-size: 20px">Inventory</p> 
+                    <a class="btn btn-default box_shadow" href="{% url 'add_product' %}" title = "ADD PRODUCTS" style="float:right">ADD PRODUCTS</a>
+                </div>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'inventory' %}" >
+                        {% csrf_token %}
+                    <table id="products" >
+                         <tr>
+                             <th><input type='checkbox' class="checkAll" name="checkAll"/></th>
+                             <th>Category</th>
+                             <th>Product Name</th>
+                             <th>Quantity</th>
+                             <th>Price</th>
+                             <th>Edit Product</th>
+                             <th>Cart</th>
+                         </tr>
+                         {% for allprod in ProductAll %}
+                         
+                         <tr>
+                                <td><input type='checkbox' value="{{ allprod.pk }}" name="check[]"/></td>
+                                <td>{{ allprod.category }}</td>
+                                <td>{{ allprod.product_name }}</td>
+                                <td>{{ allprod.quantity }}</td>
+                                <td>{{ allprod.price }}</td>
+                                <td style="text-align: center">
+                                    <a href="{% url 'edit_product' pk=allprod.pk %}">
+                                        <button type="button" class="btn btn-info">
+                                            <span class="material-icons" style="font-size: 15px">
+                                                &#xe254;
+                                            </span>
+                                            Edit
+                                        </button>
+                                    </a>
+                                </td>
+                                <td> 
+                                    <button type="button" class="btn btn-info btn-lg"  data-toggle="modal" data-target="#{{ allprod.pk }}" >
+                                        <span class="material-icons" style="font-size: 15px">
+                                            add_shopping_cart
+                                        </span>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}       
+                    </table>
+                    <div >
+                    <button type="submit" title="Delete Product" onclick="return confirm('Are you sure you want to delete this?')">
+                        <i class="material-icons" style="display:inline-block" >&#xe872;</i>
+                    </button>
+                    {% include 'pagination.html' %}
+                    </div>
+                </form>
+                 <!-- Modal -->
+                 {% for allprod in ProductAll  %}
+                 <div class="modal fade" id="{{ allprod.pk }}" role="dialog">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <form class="form-inline" action="{% url 'inventory' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">{{ allprod.category }} - {{ allprod.product_name }}</h4>
+                                    </div>
+                                      <div class="modal-body">
+                                            <div class="form-group">
+                                                <label>Product ID:</label>
+                                                <input type="text" class="form-control" value="{{ allprod.product_name }}" name="prod_name" readonly>
+                                                <br><label>Quantity:</label>
+                                                <br><input type="number" class="form-control" min="1" max="{{ allprod.quantity }}"  name="quantity" required>
+                                            </div>
+                                      </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-default" >Submit</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </form>
+                            </div>
+                         </div>
+                    </div>
+                    {% endfor %}     
+                </div>
+            </div>
+
+            </div><!-- /#wrapper -->
+    </body>
+</head>
+</html> 

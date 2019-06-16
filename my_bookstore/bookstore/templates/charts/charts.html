@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+        <!------ Include the above in your HEAD tag ---------->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/welcome.css' %}">
+        <link rel="stylesheer" type="text/css" href="{% static 'css/style1.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/charts.css' %}">
+        <script src="{% static 'js/welcome.js' %}"></script>
+        <style>
+            /* enable absolute positioning */
+            .inner-addon { 
+            position: relative; 
+            }
+
+            /* style icon */
+            .inner-addon .fa-fw {
+            position: absolute;
+            padding: 10px;
+            pointer-events: none;
+            }
+
+            /* align icon */
+            .left-addon .fa-fw  { left:  0px;}
+
+            /* add padding  */
+            .left-addon input  { padding-left:  30px; }
+        </style>
+    <body>
+            <div id="throbber" style="display:none; min-height:120px;"></div>
+            <div id="noty-holder"></div>
+            <div id="wrapper">
+                <!-- Navigation -->
+                <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="http://cijulenlinea.ucr.ac.cr/dev-users/">
+                            <img src="http://placehold.it/200x50&text=LOGO" alt="LOGO">
+                        </a>
+                    </div>
+                    <!-- Top Menu Items -->
+                    <ul class="nav navbar-right top-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin User <b class="fa fa-angle-down"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="divider"></li>
+                                <li>
+                                    <form method="POST" action="{% url 'logout' %}" class="inner-addon left-addon">
+                                        {% csrf_token %}
+                                        <i class="fa fa-fw fa-power-off"></i>
+                                        <input type="submit" value="Logout" class="form-control"/>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                   {% include 'sidebar.html' %}
+                    <!-- /.navbar-collapse -->
+                </nav>
+                <div id="page-wrapper" style="margin-top:5%">
+                    <div class="container">
+                            <div >
+                                <form method="get" action="{% url 'charts_search' %}">
+                                    <input type="text" name="category" value="{{request.GET.category }}" placeholder ="Enter exact category" required >
+                                    <input type="text" name="product_name" value="{{request.GET.product_name }}" placeholder ="Enter exact product_name" required >
+                                    <button type="submit" class="btn btn-success">Display</button>
+                                </form>
+                            </div>
+                            <form method="post" action="{% url 'charts' %}" style="float:right">
+                            {% csrf_token %}
+                            <label>View Specific Category</label>
+                            <select name="dropdown">
+                <option>-- Choose Here --</option>
+                            {% for get_cat in ob_cat %}
+    <option value="{{ get_cat.item__category }}">{{ get_cat.item__category }}</option>
+    {% endfor %}
+    </select>
+    <input type="submit" value="Select">
+    </form>
+                              {% if messages %}
+			      {% for message in messages %}
+                      <div {% if message.tags %} class="alert alert-danger" {% endif %} role="alert">
+                       <strong>{{ message }}</strong><p class="alert alert-info">
+                      </p>
+                      </div>
+        {% endfor %}
+   {% else %}
+       {{ a }}
+       <div class="modal fade" id="basicExampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Inventory Forecasting</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="width: 100%">
+         <h6 style="line-height: 0%;text-align: center">Category: {{ cat }} | Product_Name: {{ prod_name }}</h6>
+  <div id="chart-B" style="height:100%; width:100%"></div>
+   <script src="{% static 'js/highcharts.src.js' %}"></script>
+   <script src="{% static 'js/modules/exporting.src.js' %}"></script>
+    <script>
+    Highcharts.chart('chart-B',{
+        chart: {
+            backgroundColor: '#FCFFC5',
+        type: 'line',
+            zoomType: 'x'
+        },
+        credits: {
+             enabled: false
+        },
+        exporting:{
+        },
+        tooltip:{
+          shared:[true]
+        },
+        title:{
+            text: 'Sales'
+        },
+        xAxis:{
+            categories:[
+                {% for entry in key %}'{{ entry.date }}'{% if not forloop.last %}, {% endif %}{% endfor %}
+            ],
+        },
+         scrollbar: {
+        enabled: true
+    },
+        series:[
+            {
+                name:'Inventory',
+                data:[
+                    {% for entry in key %}{{ entry.quantity }}{% if not forloop.last %},{% endif %}{% endfor %}
+                ],
+            }, ]
+    });
+</script>
+  <br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+    {% endif %}
+
+                        <div class="layout">
+                            {% if post_cat == None %}
+			    
+                      <div class="col col-main" role="main" id="chart-D" style="height:100%; width:100%;">
+                        </div>
+       
+   {% else %}
+                        <div class="col col-main" role="main" id="chart-A" style="height:100%; width:100%;">
+                            </div>
+                            <div class="col col-main" role="main" id="chart-C" style="height:100%; width:100%;">
+                            </div>
+                        </div> 
+                         {%endif%}
+                         <div>
+
+                            </div> 
+                    </div>   
+                </div>
+    <!-- /#page-wrapper -->
+    <script src="{% static 'js/highcharts.src.js' %}"></script>
+    <script src="{% static 'js/modules/exporting.src.js' %}"></script>
+    <script>
+    Highcharts.chart('chart-D',{
+        chart: {
+            backgroundColor: 'white',
+        type: 'column',
+        },
+        credits: {
+             enabled: false
+        },
+        exporting:{
+        },
+        title:{
+            text: 'Sum of all the Products in a Category Charts'
+        },
+         legend: {
+    align: 'right',
+    x: -30,
+    verticalAlign: 'top',
+    y: 25,
+    floating: true,
+    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+    borderColor: '#CCC',
+    borderWidth: 1,
+    shadow: false
+  },
+        xAxis:{
+           type:"category"
+        },
+        yAxis: {
+        title: {
+            text: 'Quantity (Q)'
+        }
+    },
+   tooltip: {
+    headerFormat: '<span style="font-size:12px;font-weight: bold">{point.key}</span><table>',
+    pointFormat: '<tr><td style="color:{series.color};padding:0;font-weight: bolder">{series.name}: </td>' +
+      '<td style="padding:0"><b>{point.y:.1f} Q</b></td></tr>',
+    footerFormat: '</table>',
+    shared: true,
+    useHTML: true
+  },
+         scrollbar: {
+        enabled: true
+    },
+    
+        series:[
+        
+           
+            {% for category in all_sumcat %}
+            {
+                name:"{{ category.item__category }}",
+                data:[
+                    ['{{ category.item__category }}',{{ category.c }}], 
+                ]
+            }, 
+            {% endfor %} 
+            ]
+    });
+</script>
+
+
+
+<script>
+    Highcharts.chart('chart-A',{
+        chart: {
+            backgroundColor: 'white',
+        type: 'column',
+        },
+        credits: {
+             enabled: false
+        },
+        exporting:{
+        },
+        title:{
+            text: '{{post_cat}} Charts (Column)'
+        },
+         legend: {
+    align: 'right',
+    x: -30,
+    verticalAlign: 'top',
+    y: 25,
+    floating: true,
+    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+    borderColor: '#CCC',
+    borderWidth: 1,
+    shadow: false
+  },
+        xAxis:{
+           type:"category"
+        },
+        yAxis: {
+        title: {
+            text: 'Quantity (Q)'
+        }
+    },
+   tooltip: {
+    headerFormat: '<span style="font-size:12px;font-weight: bold">{point.key}</span><table>',
+    pointFormat: '<tr><td style="color:{series.color};padding:0;font-weight: bolder">{series.name}: </td>' +
+      '<td style="padding:0"><b>{point.y:.1f} Q</b></td></tr>',
+    footerFormat: '</table>',
+    shared: true,
+    useHTML: true
+  },
+         scrollbar: {
+        enabled: true
+    },
+    
+        series:[
+        
+            {% regroup get_cat|dictsort:"day" by item__product_name as list %}
+            {% for item__product_name in list %}
+            {
+                name:"{{ item__product_name.grouper }}",
+                data:[
+                      {% for item in item__product_name.list %} ['{{ item.day|date:"M d Y" }}',{{ item.c }}], {% endfor %} 
+                ]
+            }, 
+            {% endfor %} 
+            ]
+    });
+</script>
+
+
+<script>
+    Highcharts.chart('chart-C',{
+        chart: {
+            backgroundColor: 'white',
+        type: 'line',
+        zoomType:'x',
+        },
+        credits: {
+             enabled: false
+        },
+        exporting:{
+        },
+        title:{
+            text: '{{post_cat}} Charts (Line)'
+        },
+         legend: {
+    align: 'right',
+    x: -30,
+    verticalAlign: 'top',
+    y: 25,
+    floating: true,
+    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+    borderColor: '#CCC',
+    borderWidth: 1,
+    shadow: false
+  },
+        xAxis:{
+           type:"category"
+        },
+        yAxis: {
+        title: {
+            text: 'Quantity (Q)'
+        }
+    },
+   tooltip: {
+    headerFormat: '<span style="font-size:12px;font-weight: bold">{point.key}</span><table>',
+    pointFormat: '<tr><td style="color:{series.color};padding:0;font-weight: bolder">{series.name}: </td>' +
+      '<td style="padding:0"><b>{point.y:.1f} Q</b></td></tr>',
+    footerFormat: '</table>',
+    shared: true,
+    useHTML: true
+  },
+         scrollbar: {
+        enabled: true
+    },
+    
+        series:[
+        
+            {% regroup get_cat|dictsort:"day" by item__product_name as list %}
+            {% for item__product_name in list %}
+            {
+                name:"{{ item__product_name.grouper }}",
+                data:[
+                      {% for item in item__product_name.list %} ['{{ item.day|date:"M d Y" }}',{{ item.c }}], {% endfor %} 
+                ]
+            }, 
+            {% endfor %} 
+            ]
+    });
+</script>
+            </div><!-- /#wrapper -->
+    </body>
+</head>
+</html>
+
+   
